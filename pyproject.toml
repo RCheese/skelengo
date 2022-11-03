@@ -1,0 +1,143 @@
+[tool.poetry]
+name = "skelengo"
+version = "0.1.0"
+description = "Skeleton Django project"
+authors = ["Ruslan Samoylov <ruslan.v.samoylov@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+classifiers = [
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Other Audience",
+    "License :: MIT License",
+    "Natural Language :: Russian",
+    "Operating System :: POSIX",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3 :: Only"
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+rq = "*"
+furl = "*"
+arrow = "*"
+httpx = "*"
+hiredis = "*"
+markdown = "*"
+psycopg2 = "*"
+
+django = "*"
+django-rq = "*"
+django-redis = "*"
+django-filter = "*"
+django-taggit = "*"
+django-tinymce = "*"
+django-auditlog = "*"
+django-grappelli = "*"
+django-constance = "*"
+django-prometheus = "*"
+django-picklefield = "*"
+django-schema-graph = "*"
+django-storages = { version = "*", extras = ["boto3"] }
+
+djangorestframework = "*"
+drf-excel = "*"
+drf-spectacular = "*"
+
+tablib = { version = "*", extras = ["all"] }
+
+[tool.poetry.group.speedups]
+optional = true
+
+[tool.poetry.group.speedups.dependencies]
+msgpack = "*"
+
+[tool.poetry.group.debug]
+optional = true
+
+[tool.poetry.group.debug.dependencies]
+django-silk = "*"
+django-debug-toolbar = "*"
+
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+black = "*"
+isort = "*"
+bandit = "*"
+pre-commit = "*"
+pytest-cov = "*"
+pytest-django = "*"
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+pytest = "*"
+
+[tool.black]
+line_length = 120
+length_sort = true
+target-version = ["py310"]
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | ^.*\b(migrations)\b.*$
+    | data
+  )/
+  | foo.py           # also separately exclude a file named foo.py in
+                     # the root of the project
+)
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+filter_files = true
+skip_glob = ["docs/*", "*/migrations/*", "*/test/*", "*/tests/*"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -s -vv"
+testpaths = [
+    "tests",
+    "test_*",
+    "tests_*",
+    "*_test",
+    "*_tests"
+]
+python_files = [
+    "tests.py",
+    "test_*.py",
+    "tests_*.py",
+    "*_test.py",
+    "*_tests.py"
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+skelengo = "skelengo.manage:main"

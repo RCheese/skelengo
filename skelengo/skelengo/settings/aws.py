@@ -1,0 +1,36 @@
+import os
+
+# for boto3
+AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+AWS_S3_KEY_PREFIX = os.getenv("SKELENGO_AWS_S3_KEY_PREFIX", "")
+AWS_REGION = os.getenv("SKELENGO_AWS_REGION", "us-east-1")
+AWS_DEFAULT_ACL = os.getenv("SKELENGO_AWS_DEFAULT_ACL")
+AWS_ACCESS_KEY_ID = os.getenv("SKELENGO_AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("SKELENGO_AWS_SECRET_ACCESS_KEY")
+AWS_S3_BUCKET_NAME = os.getenv("SKELENGO_AWS_S3_BUCKET_NAME")
+
+# for django-storages
+AWS_S3_REGION_NAME = AWS_REGION
+AWS_S3_USE_SSL = os.getenv("SKELENGO_AWS_S3_USE_SSL", "TRUE").upper() == "TRUE"
+AWS_S3_SECURE_URLS = AWS_S3_USE_SSL
+AWS_AUTO_CREATE_BUCKET = os.getenv("SKELENGO_AWS_AUTO_CREATE_BUCKET", "FALSE").upper() == "TRUE"
+AWS_S3_CUSTOM_ENDPOINT = os.getenv("SKELENGO_AWS_S3_CUSTOM_ENDPOINT")
+AWS_STORAGE_BUCKET_NAME = AWS_S3_BUCKET_NAME
+
+AWS_S3_ADDRESSING_STYLE = os.getenv("SKELENGO_AWS_S3_ADDRESSING_STYLE", "virtual")
+if AWS_S3_ADDRESSING_STYLE == "path":
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_S3_CUSTOM_ENDPOINT}/{AWS_S3_BUCKET_NAME}"
+elif AWS_S3_ADDRESSING_STYLE == "virtual" and not os.getenv("SKELENGO_AWS_S3_CUSTOM_DOMAIN"):
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_S3_BUCKET_NAME}.{AWS_S3_CUSTOM_ENDPOINT}"
+elif AWS_S3_ADDRESSING_STYLE == "virtual" and os.getenv("SKELENGO_AWS_S3_CUSTOM_DOMAIN"):  # For CDN support.
+    # In case of CDN. Endpoint != custom domain
+    AWS_S3_CUSTOM_DOMAIN = os.getenv("SKELENGO_AWS_S3_CUSTOM_DOMAIN")
+else:
+    raise NameError(f'Use "path" or "virtual" AWS_S3_ADDRESSING_STYLE instead of {AWS_S3_ADDRESSING_STYLE=}')
+
+if AWS_S3_CUSTOM_DOMAIN:
+    AWS_S3_URL_PROTOCOL = "https:" if AWS_S3_USE_SSL else "http:"
+
+# for django-storages and s3direct
+AWS_SCHEMA = "https://" if AWS_S3_USE_SSL else "http://"  # used only here / hack
+AWS_S3_ENDPOINT_URL = f"{AWS_SCHEMA}{AWS_S3_CUSTOM_ENDPOINT}"

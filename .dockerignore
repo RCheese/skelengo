@@ -1,0 +1,4 @@
+# usage like whitelist
+!skelengo
+!pyproject.toml
+!poetry.lock

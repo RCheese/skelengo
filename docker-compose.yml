@@ -1,0 +1,95 @@
+version: "3.3"
+
+services:
+  api:
+    build:
+      context: .
+    networks:
+      - skelengo_net
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+      - redis
+    environment: &api_envs
+      - DJANGO_SETTINGS_MODULE=skelengo.settings
+      - SKELENGO_DB_NAME=test
+      - SKELENGO_DB_HOST=postgres
+      - SKELENGO_DB_PORT=5432
+      - SKELENGO_DB_USER_NAME=test
+      - SKELENGO_DB_PASSWORD=test
+      - SKELENGO_REDIS_HOST=redis
+      - SKELENGO_REDIS_PORT=6379
+    command: >
+      ash -c "skelengo migrate
+      && skelengo runserver :8000
+      "
+
+  rq:
+    build:
+      context: .
+    networks:
+      - skelengo_net
+    depends_on:
+      - redis
+    environment:
+      - DJANGO_SETTINGS_MODULE=skelengo.settings
+      - SKELENGO_DB_NAME=test
+      - SKELENGO_DB_HOST=postgres
+      - SKELENGO_DB_PORT=5432
+      - SKELENGO_DB_USER_NAME=test
+      - SKELENGO_DB_PASSWORD=test
+      - SKELENGO_REDIS_HOST=redis
+      - SKELENGO_REDIS_PORT=6379
+    command: [ "rq", "worker", "--with-scheduler" ]
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - 5432:5432
+    networks:
+      - skelengo_net
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_DB=test
+      - POSTGRES_PASSWORD=test
+    shm_size: 1gb
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+    networks:
+      - skelengo_net
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - 9000:9000
+      - 9001:9001
+    command: [ "server", "/data", "--console-address", ":9001" ]
+    environment:
+      MINIO_ROOT_USER: test
+      MINIO_ROOT_PASSWORD: testtesttest
+      MINIO_DOMAIN: test-bucket.localhost
+    networks:
+      - skelengo_net
+
+  minio_client:
+    image: minio/mc
+    depends_on:
+      - minio
+    environment:
+      - MC_HOST_minminio=http://test:testtesttest@minio:9000
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc mb minminio/test-bucket;
+      /usr/bin/mc anonymous set public minminio/test-bucket;
+      "
+    networks:
+      - skelengo_net
+
+networks:
+  skelengo_net: { }

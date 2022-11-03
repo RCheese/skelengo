@@ -1,0 +1,5 @@
+CONTENT_LOCATION = "site"
+STATIC_LOCATION = "static"
+MEDIA_LOCATION = "media/public"
+PRIVATE_MEDIA_LOCATION = "media/private"
+WEB_CONTENT_LOCATION = "web-site"
